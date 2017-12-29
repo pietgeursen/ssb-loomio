@@ -1,0 +1,32 @@
+{
+  "name": "ssb-loomio-schema",
+  "version": "1.0.0",
+  "description": "Create and vote on polls on ssb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pietgeursen/ssb-loomio-schema.git"
+  },
+  "keywords": [
+    "loomio",
+    "vote",
+    "ssb",
+    "democracy",
+    "schema"
+  ],
+  "author": "pietgeursen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pietgeursen/ssb-loomio-schema/issues"
+  },
+  "homepage": "https://github.com/pietgeursen/ssb-loomio-schema#readme",
+  "devDependencies": {
+    "tape": "^4.8.0"
+  },
+  "dependencies": {
+    "is-my-json-valid": "^2.17.1"
+  }
+}
