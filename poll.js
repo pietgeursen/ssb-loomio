@@ -1,7 +1,42 @@
 var Validate = require('is-my-json-valid')
 const { msgIdRegex, feedIdRegex, blobIdRegex } = require('ssb-ref')
 
-function create(){}
+function create(text, root, branch, mentions, recps, channel, pollType){
+  var content = { type: 'poll', text, pollType}
+  if (root) {
+    root = link(root)
+    if (!root)
+      throw new Error('root is not a valid link')
+    content.root = root
+  }
+  if (branch) {
+    if (!root)
+      throw new Error('root is not a valid link')
+    branch = Array.isArray(branch) ? branch.map(link) : link(branch)
+    if (!branch)
+      throw new Error('branch is not a valid link')
+    content.branch = branch
+  }
+  if (mentions && (!Array.isArray(mentions) || mentions.length)) {
+    mentions = links(mentions)
+    if (!mentions || !mentions.length)
+      throw new Error('mentions are not valid links')
+    content.mentions = mentions
+  }
+  if (recps && (!Array.isArray(recps) || recps.length)) {
+    recps = links(recps)
+    if (!recps || !recps.length)
+      throw new Error('recps are not valid links')
+    content.recps = recps
+  }
+  if (channel) {
+    if (typeof channel !== 'string')
+      throw new Error('channel must be a string')
+    content.channel = channel
+  }
+
+  return content
+}
 
 const schema = {
   $schema: 'http://json-schema.org/schema#',
@@ -16,9 +51,9 @@ const schema = {
       oneOf: [
         { $ref: '#/definitions/pollTypes/dot'},
         { $ref: '#/definitions/pollTypes/proposal'},
-        { $ref: '#/definitions/pollTypes/rsvp'},
-        { $ref: '#/definitions/pollTypes/meeting'},
         { $ref: '#/definitions/pollTypes/score'},
+        //{ $ref: '#/definitions/pollTypes/rsvp'},
+        //{ $ref: '#/definitions/pollTypes/meeting'},
       ] 
     },
     text: { type: 'string' },
@@ -67,10 +102,15 @@ const schema = {
       pattern: blobIdRegex
     },
     pollTypes: {
+      type: 'object',
       dot: {
-        type: 'object', 
-        required: ['maxStanceScore', 'options'],
+        type: 'object',
+        required: ['type', 'maxStanceScore', 'choices'],
         properties: {
+          type: {
+            type: 'string',
+            pattern: '^dot$'
+          },
           maxStanceScore: {
             type: 'integer',
             minimum: 0
@@ -78,12 +118,42 @@ const schema = {
           maxChoiceScore: {
             type: 'integer',
             minimum: 0
-          }, 
-          options: {
+          },
+          choices: {
             type: 'array',
           }
         }
-      } 
+      },
+      proposal: {
+        type: 'object',
+        required: ['type', 'proposal'],
+        properties: {
+          type: {
+            type: 'string',
+            pattern: '^proposal$'
+          },
+          proposal: {
+            type: 'string',
+          }
+        }
+      },
+      score: {
+        type: 'object',
+        required: ['type', 'maxChoiceScore', 'choices'],
+        properties: {
+          type: {
+            type: 'string',
+            pattern: '^score$'
+          },
+          maxChoiceScore: {
+            type: 'integer',
+            minimum: 2
+          },
+          choices: {
+            type: 'array',
+          }
+        }
+      },
     },
     mentions: {
       message: {
@@ -109,10 +179,10 @@ const schema = {
           name: { type: 'string' }
         }
       }
-
     }
   },
 }
+
 const validate = Validate(schema, { verbose: true })
 
 module.exports = {
