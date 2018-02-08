@@ -34,14 +34,57 @@ With [npm](https://npmjs.org/) installed, run
 $ npm install ssb-loomio
 ```
 
+## Schemas
+
+Poll message content
+```
+{
+  type: 'poll', // required
+  pollType: oneOf:[dot, proposal, score] , // required
+  text: String, // required
+  mentions, //optional
+}
+
+```
+
+Dot vote pollType
+```
+{
+  type: 'dot', // required
+  maxStanceScore: 'Integer >= 0', // required
+  maxChoiceScore: 'Integer >= 0', //optional
+  choices: Array, // required
+}
+```
+
+Proposal pollType
+```
+{
+  type: 'proposal', // required
+  proposal: String, // required
+}
+```
+
+Score pollType
+```
+{
+  type: 'score', // required
+  maxChoiceScore: 'Integer >= 0', //required
+  choices: Array, // required
+}
+```
+
+Position
+```
+
+```
+
 ## Acknowledgments
 
-ssb-loomio was inspired by..
+ssb-loomio was inspired by loomio! Massive thanks to Rob Guthrie and James Kiesel for spending time giving us a brain dump of their data model.
 
 ## See Also
 
-- [`noffle/common-readme`](https://github.com/noffle/common-readme)
-- ...
 
 ## License
 
