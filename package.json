@@ -1,5 +1,5 @@
 {
-  "name": "ssb-loomio-schema",
+  "name": "ssb-loomio",
   "version": "1.0.0",
   "description": "Create and vote on polls on ssb",
   "main": "index.js",

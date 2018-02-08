@@ -1,4 +1,4 @@
-# ssb-loomio-schema
+# ssb-loomio
 
 > Create and vote on polls on ssb
 
