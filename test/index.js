@@ -8,14 +8,14 @@ test('test', function(t) {
 
 test('create and validate an invalid dot vote', function(t) {
   pollType = {}
-  var myPoll = poll("how many food", null, null, null, null, null, pollType)
+  var myPoll = poll({text:"how many food", mentions: null, recps: null, channel: null, pollType})
   t.false(isPoll(myPoll))
   t.end()
 })
 
 test('create and validate a valid dot vote', function(t) {
   pollType = {type: 'dot', maxStanceScore: 10, choices: ['cats', 'dogs']}
-  var myPoll = poll("how many food", null, null, null, null, null, pollType)
+  var myPoll = poll({text:"how many food", mentions: null, recps: null, channel: null, pollType})
   t.true(isPoll(myPoll))
   t.end()
 })

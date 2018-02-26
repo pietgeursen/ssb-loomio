@@ -1,7 +1,11 @@
+//TODO: pull out schema to seperate file
+//TODO: isPoll should be able to take a poll or a message that contains a poll.
+//TODO: copy Mix's pattern with constructors and inject.
 var Validate = require('is-my-json-valid')
-const { msgIdRegex, feedIdRegex, blobIdRegex } = require('ssb-ref')
+var { schema, validate } = require('./schema/poll.js')
+var { link } = require('ssb-msg-schemas/util')
 
-function create(text, root, branch, mentions, recps, channel, pollType){
+function create({text, mentions, recps, channel, pollType, root, branch}){
   var content = { type: 'poll', text, pollType}
   if (root) {
     root = link(root)
@@ -37,153 +41,6 @@ function create(text, root, branch, mentions, recps, channel, pollType){
 
   return content
 }
-
-const schema = {
-  $schema: 'http://json-schema.org/schema#',
-  type: 'object',
-  required: ['type', 'pollType'],
-  properties: {
-    type: {
-      type: 'string',
-      pattern: '^poll$'
-    },
-    pollType: {
-      oneOf: [
-        { $ref: '#/definitions/pollTypes/dot'},
-        { $ref: '#/definitions/pollTypes/proposal'},
-        { $ref: '#/definitions/pollTypes/score'},
-        //{ $ref: '#/definitions/pollTypes/rsvp'},
-        //{ $ref: '#/definitions/pollTypes/meeting'},
-      ] 
-    },
-    text: { type: 'string' },
-    mentions: {
-      oneOf: [
-        { type: 'null' },
-        {
-          type: 'array',
-          items: {
-            oneOf: [
-              { $ref: '#/definitions/mentions/message' },
-              { $ref: '#/definitions/mentions/feed' },
-              { $ref: '#/definitions/mentions/blob' }
-            ]
-          }
-        }
-      ]
-    },
-    recps: {
-      oneOf: [
-        { type: 'null' },
-        {
-          type: 'array',
-          items: {
-            oneOf: [
-              { $ref: '#/definitions/feedId' },
-              { $ref: '#/definitions/mentions/feed' },
-            ]
-          }
-        }
-      ]
-    }
-  },
-  definitions: {
-
-    messageId: {
-      type: 'string',
-      pattern: msgIdRegex
-    },
-    feedId: {
-      type: 'string',
-      pattern: feedIdRegex
-    },
-    blobId: {
-      type: 'string',
-      pattern: blobIdRegex
-    },
-    pollTypes: {
-      type: 'object',
-      dot: {
-        type: 'object',
-        required: ['type', 'maxStanceScore', 'choices'],
-        properties: {
-          type: {
-            type: 'string',
-            pattern: '^dot$'
-          },
-          maxStanceScore: {
-            type: 'integer',
-            minimum: 0
-          },
-          maxChoiceScore: {
-            type: 'integer',
-            minimum: 0
-          },
-          choices: {
-            type: 'array',
-          }
-        }
-      },
-      proposal: {
-        type: 'object',
-        required: ['type', 'proposal'],
-        properties: {
-          type: {
-            type: 'string',
-            pattern: '^proposal$'
-          },
-          proposal: {
-            type: 'string',
-          }
-        }
-      },
-      score: {
-        type: 'object',
-        required: ['type', 'maxChoiceScore', 'choices'],
-        properties: {
-          type: {
-            type: 'string',
-            pattern: '^score$'
-          },
-          maxChoiceScore: {
-            type: 'integer',
-            minimum: 2
-          },
-          choices: {
-            type: 'array',
-          }
-        }
-      },
-    },
-    mentions: {
-      message: {
-        type: 'object',
-        required: ['link'],
-        properties: {
-          link: { $ref: '#/definitions/messageId'}
-        }
-      },
-      feed: {
-        type: 'object',
-        required: ['link', 'name'],
-        properties: {
-          link: { $ref: '#/definitions/feedId'},
-          name: { type: 'string' }
-        }
-      },
-      blob: {
-        type: 'object',
-        required: ['link', 'name'],
-        properties: {
-          link: { $ref: '#/definitions/blobId'},
-          name: { type: 'string' }
-        }
-      }
-    }
-  },
-}
-
-const validate = Validate(schema, { verbose: true })
 
 module.exports = {
   create,
